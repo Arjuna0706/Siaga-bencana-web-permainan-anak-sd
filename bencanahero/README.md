@@ -41,20 +41,3 @@ python -m http.server 8000
 # lalu buka http://localhost:8000
 ```
 Atau gunakan ekstensi **Live Server** di VS Code.
-
-## Deploy ke GitHub Pages
-1. Buat repository baru di GitHub, unggah semua isi folder ini.
-2. Buka **Settings → Pages**.
-3. Bagian **Source**: pilih **Deploy from a branch**.
-4. **Branch**: `main` (atau `master`), folder `/ (root)`, lalu **Save**.
-5. Tunggu beberapa menit; situs akan tersedia di
-   `https://<username>.github.io/<nama-repo>/`.
-
-File `.nojekyll` sudah disertakan agar GitHub Pages menyajikan berkas apa adanya.
-
-## Catatan
-- Progres pemain (nama & bintang) saat ini tersimpan hanya selama sesi
-  (di-reset saat halaman dimuat ulang). Struktur ini disiapkan agar mudah
-  disambungkan ke backend penyimpanan di kemudian hari.
-- Materi & soal disusun untuk jenjang SD dan dapat disesuaikan pada
-  `js/data.js` (soal, skenario) dan `js/game.js` (materi Belajar).
