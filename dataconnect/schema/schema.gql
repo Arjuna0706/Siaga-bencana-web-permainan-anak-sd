@@ -1,0 +1,34 @@
+type User @table {
+  username: String!
+  createdAt: Timestamp!
+  email: String
+  avatarUrl: String
+}
+
+type GameSession @table {
+  currentLevel: Int!
+  score: Int64!
+  updatedAt: Timestamp!
+  inventoryData: String
+  lastCheckpoint: String
+  user: User!
+}
+
+type Achievement @table {
+  name: String!
+  unlockedAt: Timestamp!
+  description: String
+  iconUrl: String
+  user: User!
+}
+
+type LeaderboardEntry @table {
+  highScore: Int64!
+  updatedAt: Timestamp!
+  user: User!
+}
+
+type GameConfig @table {
+  configName: String!
+  settingsValue: String!
+}

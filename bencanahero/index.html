@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siaga Bencana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Cinzel:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <!-- 🎵 Musik latar (BGM). Taruh file audio.mp3 kamu di folder audio/ dengan nama persis di bawah ini. -->
+  <audio id="menuBgmAudio" src="assets/audio/menu-bgm.mp3" loop preload="auto"></audio>
+  <audio id="mainBgmAudio" src="assets/audio/main-bgm.mp3" loop preload="auto"></audio>
+
+
+  <div id="sky">
+    <div class="sun"></div>
+  </div>
+  <div id="confetti"></div>
+
+  <!-- 🎬 Video latar BERSAMA untuk Splash / Menu Utama / Login.
+       HANYA SATU elemen <video> ini yang dipakai oleh ketiga layar tersebut — elemen ini
+       dipindah (prepend) ke layar yang sedang aktif lewat js/game.js, sehingga waktu
+       putarnya TIDAK pernah reset/restart saat berpindah antar Splash/Menu/Login.
+       Alurnya: mula-mula memutar file "intro" (background_menuutama.mp4) SEKALI (tanpa
+       loop). Begitu selesai, otomatis lanjut memutar file "loop" (background_menuutama_loop.mp4)
+       yang diulang terus-menerus. Cukup sediakan kedua file ini di assets/videos/. -->
+  <video id="menuUtamaBgVideo" class="menu-bg-video" muted playsinline autoplay aria-hidden="true"></video>
+
+  <!-- SPLASH -->
+  <div class="screen active" id="splash">
+    <div style="text-align:center;">
+      <img class="spl-badge" id="splBadge" src="assets/images/logo.png" alt="Logo">
+      <div class="spl-kicker">Buku Saku Siaga</div>
+      <div class="spl-logo">Siaga<em>Bencana</em></div>
+      <div class="spl-sub">Game Edukasi Siaga Bencana</div>
+      <div class="spl-track">
+        <div class="spl-bar" id="sBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div class="screen" id="menu">
+    <div class="menu-logo mreveal" style="--d:0s">Siaga<em>Bencana</em></div>
+    <div class="menu-tag mreveal" style="--d:.12s">Lindungi semesta dan jadilah sang pahlawan!</div>
+    <div class="menu-btns">
+      <button class="btn btn-primary mreveal" style="--d:.24s" onclick="startPlayFlow()"><span class="ic-h" data-ic="play"></span> Mulai
+        Bermain</button>
+      <button class="btn btn-secondary mreveal" style="--d:.36s" onclick="openModal('howtoplayModal')"><span class="ic-h" data-ic="book"></span>
+        Cara Bermain</button>
+      <button class="btn btn-secondary mreveal" style="--d:.48s" onclick="openModal('settingsModal')"><span class="ic-h" data-ic="gear"></span>
+        Pengaturan</button>
+    </div>
+    <div class="menu-foot mreveal" style="--d:.6s"><span class="ic-h" data-ic="cap"></span> Untuk siswa SD kelas 5–6</div>
+  </div>
+  </div>
+
+  <!-- LOGIN / REGISTER -->
+  <div class="screen" id="login">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <img class="auth-emblem" id="loginEmblem" src="assets/images/logo.png" alt="Logo">
+        <div class="auth-logo">Siaga<em>Bencana</em></div>
+        <div class="auth-tag">Masuk dulu, yuk, sebelum mulai berpetualang!</div>
+
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab on" id="tabLogin" onclick="switchAuthTab('login')">Masuk</button>
+          <button type="button" class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Daftar
+            Akun</button>
+        </div>
+
+        <div class="auth-msg" id="authMsg"></div>
+
+        <!-- LOGIN FORM -->
+        <form class="auth-form show" id="formLogin" onsubmit="return attemptLogin(event)" novalidate>
+          <div class="auth-field">
+            <label class="sg-label" for="loginName"><span class="ic-h" data-ic="user"></span> Nama</label>
+            <input class="sg-input" type="text" id="loginName" placeholder="Tulis namamu di sini..." maxlength="30"
+              autocomplete="username" required>
+          </div>
+          <div class="auth-field">
+            <label class="sg-label" for="loginPassword"><span class="ic-h" data-ic="lock"></span> Kata Sandi</label>
+            <div class="auth-pw-wrap">
+              <input class="sg-input" type="password" id="loginPassword" placeholder="Masukkan kata sandi"
+                autocomplete="current-password" required>
+              <button type="button" class="auth-eye" onclick="togglePw('loginPassword',this)"
+                aria-label="Lihat kata sandi"><span class="ic-h" data-ic="eye"></span></button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary auth-submit"><span class="ic-h" data-ic="play"></span> Masuk
+            &amp; Mulai Bermain</button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form class="auth-form" id="formRegister" onsubmit="return attemptRegister(event)" novalidate>
+          <div class="auth-field">
+            <label class="sg-label" for="regName"><span class="ic-h" data-ic="user"></span> Nama Lengkap</label>
+            <input class="sg-input" type="text" id="regName" placeholder="Tulis namamu di sini..." maxlength="30"
+              required>
+          </div>
+          <div class="auth-field">
+            <label class="sg-label" for="regPassword"><span class="ic-h" data-ic="lock"></span> Kata Sandi</label>
+            <div class="auth-pw-wrap">
+              <input class="sg-input" type="password" id="regPassword" placeholder="Minimal 6 karakter"
+                autocomplete="new-password" required minlength="6">
+              <button type="button" class="auth-eye" onclick="togglePw('regPassword',this)"
+                aria-label="Lihat kata sandi"><span class="ic-h" data-ic="eye"></span></button>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label class="sg-label" for="regPassword2"><span class="ic-h" data-ic="lock"></span> Ulangi Kata
+              Sandi</label>
+            <input class="sg-input" type="password" id="regPassword2" placeholder="Ulangi kata sandi"
+              autocomplete="new-password" required minlength="6">
+          </div>
+          <button type="submit" class="btn btn-primary auth-submit"><span class="ic-h" data-ic="check"></span> Daftar
+            Akun</button>
+          <div class="auth-note"><span class="ic-h" data-ic="alert"></span><span>Ingat baik-baik nama &amp; kata
+              sandimu, ya — kamu akan memakainya untuk <b>masuk</b> nanti.</span></div>
+        </form>
+
+        <button type="button" class="btn btn-secondary btn-sm auth-back" onclick="gotoScreen('menu')"><span class="ic-h"
+            data-ic="arrowLeft"></span> Kembali ke Beranda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION SHEET -->
+  <div class="modal-bg" id="missionSheet" onclick="if(event.target===this)closeModal('missionSheet')">
+    <div class="modal sheet" id="missionSheetCard"></div>
+  </div>
+
+  <!-- SETTINGS MODAL (HUB) -->
+  <div class="modal-bg" id="settingsModal">
+    <div class="modal">
+      <div class="modal-title"><span class="ic-h" data-ic="gear"></span> Pengaturan</div>
+      <div class="sg-menu" id="sgMenu">
+        <button type="button" class="sg-menu-item" onclick="openSubSettings('settingsAccountModal')">
+          <span class="sg-menu-ico"><span class="ic-h" data-ic="user"></span></span>
+          <span class="sg-menu-text"><span class="sg-menu-title">Akun &amp; Profil</span><span class="sg-menu-sub"
+              id="sgAccountSub">Belum masuk</span></span>
+          <span class="ic-h sg-menu-arrow" data-ic="arrowRight"></span>
+        </button>
+        <button type="button" class="sg-menu-item" onclick="openSubSettings('settingsAudioModal')">
+          <span class="sg-menu-ico"><span class="ic-h" data-ic="volume"></span></span>
+          <span class="sg-menu-text"><span class="sg-menu-title">Suara</span><span class="sg-menu-sub">Atur volume musik
+              &amp; efek suara</span></span>
+          <span class="ic-h sg-menu-arrow" data-ic="arrowRight"></span>
+        </button>
+        <button type="button" class="sg-menu-item" onclick="openSubSettings('settingsAboutModal')">
+          <span class="sg-menu-ico"><span class="ic-h" data-ic="info"></span></span>
+          <span class="sg-menu-text"><span class="sg-menu-title">Tentang BencanaHero</span><span
+              class="sg-menu-sub">Versi &amp; info game</span></span>
+          <span class="ic-h sg-menu-arrow" data-ic="arrowRight"></span>
+        </button>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:22px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeModal('settingsModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS: AKUN & PROFIL -->
+  <div class="modal-bg" id="settingsAccountModal">
+    <div class="modal">
+      <div class="modal-title"><span class="ic-h" data-ic="user"></span> Akun &amp; Profil</div>
+      <div class="sg" id="sgAccount"></div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="backToSettings('settingsAccountModal')"><span
+            class="ic-h" data-ic="arrowLeft"></span> Kembali</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS: SUARA -->
+  <div class="modal-bg" id="settingsAudioModal">
+    <div class="modal">
+      <div class="modal-title"><span class="ic-h" data-ic="volume"></span> Suara</div>
+      <div class="sg aud-panel">
+        <div class="aud-row aud-row-main">
+          <button type="button" class="aud-mute" id="muteMaster" onclick="toggleAudioMute('master')"
+            aria-label="Bisukan audio utama"><span class="ic-h" data-ic="volume"></span></button>
+          <div class="aud-info">
+            <span class="aud-label">Audio Utama<span class="aud-val" id="valMaster">80</span></span>
+            <input type="range" min="0" max="100" step="1" class="aud-range" id="rangeMaster"
+              oninput="onAudioSlide('master',this.value)">
+          </div>
+        </div>
+        <div class="aud-branch">
+          <div class="aud-row">
+            <button type="button" class="aud-mute" id="muteMusic" onclick="toggleAudioMute('music')"
+              aria-label="Bisukan musik"><span class="ic-h" data-ic="volume"></span></button>
+            <div class="aud-info">
+              <span class="aud-label">Musik<span class="aud-val" id="valMusic">65</span></span>
+              <input type="range" min="0" max="100" step="1" class="aud-range" id="rangeMusic"
+                oninput="onAudioSlide('music',this.value)">
+            </div>
+          </div>
+          <div class="aud-row">
+            <button type="button" class="aud-mute" id="muteSfx" onclick="toggleAudioMute('sfx')"
+              aria-label="Bisukan efek suara"><span class="ic-h" data-ic="volume"></span></button>
+            <div class="aud-info">
+              <span class="aud-label">Efek Suara (SFX)<span class="aud-val" id="valSfx">85</span></span>
+              <input type="range" min="0" max="100" step="1" class="aud-range" id="rangeSfx"
+                oninput="onAudioSlide('sfx',this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="backToSettings('settingsAudioModal')"><span
+            class="ic-h" data-ic="arrowLeft"></span> Kembali</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS: TENTANG -->
+  <div class="modal-bg" id="settingsAboutModal">
+    <div class="modal">
+      <div class="modal-title"><span class="ic-h" data-ic="info"></span> Tentang BencanaHero</div>
+      <div class="sg sg-about">
+        <p><b>BencanaHero</b> adalah game edukasi siaga bencana untuk siswa SD kelas 5–6.</p>
+        <p>Pemain belajar mengambil keputusan yang tepat dan menyusun langkah-langkah keselamatan saat menghadapi 7
+          jenis bencana alam, mulai dari gempa bumi hingga tsunami.</p>
+        <p class="sg-about-ver">Versi <span class="mono">1.0.0</span></p>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="backToSettings('settingsAboutModal')"><span
+            class="ic-h" data-ic="arrowLeft"></span> Kembali</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KOLEKSI MODAL -->
+  <div class="modal-bg" id="koleksiModal">
+    <div class="modal">
+      <div class="modal-title"><span class="ic-h" data-ic="trophy"></span> Lencana Pahlawan</div>
+      <div id="kolList"></div>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('koleksiModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW TO PLAY (MODAL — bisa dibuka dari mana saja) -->
+  <div class="modal-bg" id="howtoplayModal" onclick="if(event.target===this)closeModal('howtoplayModal')">
+    <div class="modal htp-wrap">
+      <div class="htp-title"><span class="ic-h" data-ic="book"></span> Cara Bermain</div>
+      <div>
+        <div class="htp-slide show">
+          <div class="htp-card">
+            <div class="big-icon" style="background:#FBEAE2;color:var(--signal)"><span class="ic-h"
+                data-ic="target"></span></div>
+            <h3>1. Pilih Bencana</h3>
+            <p>Ikuti jalur petualangan berisi 7 misi bencana — mulai dari Gempa Bumi sampai misi terakhir: Tsunami! Raih
+              minimal 2 bintang di sebuah misi untuk membuka misi berikutnya.</p>
+          </div>
+        </div>
+        <div class="htp-slide">
+          <div class="htp-card">
+            <div class="big-icon" style="background:#EAF1F5;color:var(--denim)"><span class="ic-h"
+                data-ic="question"></span></div>
+            <h3>2. Ambil Keputusan</h3>
+            <p>Baca cerita situasi daruratnya, lalu pilih satu tindakan awal yang menurutmu paling tepat. Keputusanmu
+              menentukan poin awalmu, jadi pikirkan baik-baik!</p>
+          </div>
+        </div>
+        <div class="htp-slide">
+          <div class="htp-card">
+            <div class="big-icon" style="background:#EFEAF6;color:#6A5AA6"><span class="ic-h" data-ic="puzzle"></span>
+            </div>
+            <h3>3. Susun Blok Langkah</h3>
+            <p>Seperti puzzle! Susun blok-blok tindakan dalam urutan yang benar. Klik blok di panel kanan untuk
+              menambahnya. Geser blok atau pakai tombol naik/turun untuk mengatur urutannya.</p>
+          </div>
+        </div>
+        <div class="htp-slide">
+          <div class="htp-card">
+            <div class="big-icon" style="background:#E7F3EA;color:var(--siaga)"><span class="ic-h"
+                data-ic="play"></span></div>
+            <h3>4. Jalankan Simulasi</h3>
+            <p>Tekan tombol JALANKAN dan saksikan rencanamu berjalan: setiap langkah tampil sebagai kartu aksi satu per
+              satu di atas adegan bencananya!</p>
+          </div>
+        </div>
+        <div class="htp-slide">
+          <div class="htp-card">
+            <div class="big-icon" style="background:#FBEFD4;color:var(--marker-d)"><span class="ic-h"
+                data-ic="star"></span></div>
+            <h3>5. Raih Bintang!</h3>
+            <p>Lihat poin dan bintangmu, lalu baca penjelasan ilmiahnya. Coba lagi untuk mendapat 3 bintang penuh di
+              semua bencana!</p>
+          </div>
+        </div>
+      </div>
+      <div class="htp-foot">
+        <button class="btn btn-secondary btn-sm" onclick="htpPrev()"><span class="ic-h" data-ic="arrowLeft"></span>
+          Sebelumnya</button>
+        <div class="htp-dots" id="htpDots"></div>
+        <button class="btn btn-primary btn-sm" id="htpNextBtn" onclick="htpNext()">Selanjutnya</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DASHBOARD (SCENARIO SELECT) -->
+  <div class="screen" id="select">
+    <div class="dash-shell">
+      <aside class="dash-side">
+        <div class="ds-logo">
+          <img class="ds-shield" id="dashShield" src="assets/images/logo.png" alt="Logo">
+          <span>Siaga<span class="highlight">Bencana</span></span>
+        </div>
+        <nav class="ds-nav">
+          <button class="ds-item" onclick="gotoScreen('menu')"><span class="ic-h" data-ic="home"></span>
+            Beranda</button>
+          <button class="ds-item" onclick="gotoScreen('belajar')"><span class="ic-h" data-ic="book"></span>
+            Belajar</button>
+          <button class="ds-item active"><span class="ic-h" data-ic="flag"></span> Misi</button>
+          <button class="ds-item" onclick="openModal('koleksiModal')"><span class="ic-h" data-ic="trophy"></span>
+            Koleksi</button>
+          <button class="ds-item" onclick="openModal('howtoplayModal')"><span class="ic-h" data-ic="question"></span>
+            Cara Bermain</button>
+          <button class="ds-item" onclick="openModal('settingsModal')"><span class="ic-h" data-ic="gear"></span>
+            Pengaturan</button>
+        </nav>
+      </aside>
+      <main class="dash-main">
+        <div class="dash-hero">
+          <img class="dh-bg-img" src="assets/images/pannel-misi.png" alt="">
+          <img class="dh-fg-img" src="assets/images/pannel.png" alt="">
+          <div class="dh-left">
+            <div class="dh-text">
+              <div class="dh-kicker">Pusat Misi</div>
+              <div class="dh-greet" id="selGreeting">Halo!</div>
+              <div class="dh-sub">Selesaikan misimu dan jadilah sang penakhluk bencana!</div>
+              <div class="dh-progress">
+                <div class="dh-prog-fill" id="selProgFill"></div>
+              </div>
+              <div class="dh-prog-lbl" id="selProgLbl">0/21 bintang terkumpul</div>
+            </div>
+          </div>
+          <div class="dh-right">
+            <span class="dh-stars"><span class="ic-h" data-ic="star"></span><b id="selTotal">0</b><span
+                class="dh-stars-lbl">Bintang</span></span>
+            <button class="dh-gear" onclick="openModal('howtoplayModal')" aria-label="Cara Bermain"><span class="ic-h"
+                data-ic="question"></span></button>
+            <button class="dh-gear" onclick="openModal('settingsModal')" aria-label="Pengaturan"><span class="ic-h"
+                data-ic="gear"></span></button>
+          </div>
+        </div>
+        <div class="dash-content" id="selContent">
+          <img class="adv-bg-img" id="advBgImg" src="assets/images/background-misi.jpg" alt="">
+          <div class="dc-head"><span class="dc-txt"><span class="ic-h" data-ic="flag"></span> Daftar Misi
+              Bencana</span><span class="dc-rule"></span></div>
+          <div class="mission-grid" id="scGrid"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- BELAJAR -->
+  <div class="screen" id="belajar">
+    <div class="dash-shell">
+      <aside class="dash-side">
+        <div class="ds-logo"><img class="ds-shield" id="belajarShield" src="assets/images/logo.png" alt="Logo"><span>Siaga<span class="highlight">Bencana</span></span></div>
+        <nav class="ds-nav">
+          <button class="ds-item" onclick="gotoScreen('menu')"><span class="ic-h" data-ic="home"></span>
+            Beranda</button>
+          <button class="ds-item active"><span class="ic-h" data-ic="book"></span> Belajar</button>
+          <button class="ds-item" onclick="gotoScreen('select')"><span class="ic-h" data-ic="flag"></span> Misi</button>
+          <button class="ds-item" onclick="openModal('koleksiModal')"><span class="ic-h" data-ic="trophy"></span>
+            Koleksi</button>
+          <button class="ds-item" onclick="openModal('howtoplayModal')"><span class="ic-h" data-ic="question"></span>
+            Cara Bermain</button>
+          <button class="ds-item" onclick="openModal('settingsModal')"><span class="ic-h" data-ic="gear"></span>
+            Pengaturan</button>
+        </nav>
+      </aside>
+      <main class="dash-main" id="belajarMain">
+        <div class="rd-topbar">
+          <div class="rd-eyebrow">Buku Saku Siaga</div>
+          <div class="rd-htitle">Materi Kesiapsiagaan</div>
+        </div>
+        <div class="rd-wrap">
+          <aside class="rd-rail">
+            <div class="rd-rail-head">Daftar Bencana</div>
+            <div id="learnRail"></div>
+          </aside>
+          <section class="rd-read" id="learnRead"></section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="screen" id="game">
+    <div class="g-topbar">
+      <div class="g-left">
+        <button class="btn btn-secondary btn-icon tt" onclick="gotoScreen('select')"><span class="ic-h"
+            data-ic="arrowLeft"></span>
+          <span class="tt-text">Pilih bencana lain</span></button>
+        <div class="g-badge"><span class="gly" id="gGlyph"></span><span id="gTitle">Gempa Bumi</span></div>
+        <div class="g-score"><span class="ic-h" data-ic="star"></span> <span id="gScore">0</span></div>
+      </div>
+      <div class="g-phases">
+        <div class="ph-step active" id="ps1">
+          <div class="ph-num"><span class="ph-numtext">1</span></div>Keputusan
+        </div>
+        <div class="ph-sep">›</div>
+        <div class="ph-step" id="ps2">
+          <div class="ph-num"><span class="ph-numtext">2</span></div>Susun Blok
+        </div>
+        <div class="ph-sep">›</div>
+        <div class="ph-step" id="ps3">
+          <div class="ph-num"><span class="ph-numtext">3</span></div>Hasil
+        </div>
+      </div>
+      <div class="g-player"><span class="ic-h" data-ic="user"></span> <span id="gPlayer">Pemain</span></div>
+    </div>
+
+    <div class="g-body">
+      <!-- DECISION PHASE -->
+      <div id="ph-decision" class="show" style="display:none;flex:1;">
+        <div class="dec-layout">
+          <div class="sim-stage" id="simStage">
+            <div class="scene-layer" id="simScene"></div>
+            <div class="sim-water-overlay" id="simWater"></div>
+            <div class="sim-char" id="simChar"></div>
+            <div class="sim-bubble" id="simBubble"><span class="ic-h" data-ic="alert"></span> Situasi darurat!</div>
+          </div>
+          <div class="dec-panel">
+            <div class="dec-progress" id="decProgress"><span class="dp-label" id="dpLabel">Soal 1 dari 5</span>
+              <div class="dp-dots" id="dpDots"></div>
+            </div>
+            <div class="story-box"><strong id="storyTitle">Gempa Bumi!</strong><span id="storyText"></span>
+              <div class="dec-q" id="decQ"><span class="ic-h" data-ic="question"></span> Apa yang harus kamu lakukan
+                lebih dulu?</div>
+            </div>
+            <div class="dec-options" id="decOpts"></div>
+            <div class="dec-hint" id="decHint" style="display:none"></div>
+            <div class="dec-foot">
+              <button class="btn btn-primary" id="decNextBtn" onclick="confirmDecision()" disabled
+                style="opacity:.45;">Lanjut ke Blok</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCKS PHASE -->
+      <div id="ph-blocks" style="display:none;flex:1;position:relative;">
+        <div class="blk-layout">
+          <div class="blk-workspace">
+            <div class="blk-ws-head">
+              <div class="blk-ws-title"><span class="ic-h" data-ic="puzzle"></span> Area Kerja — Susun Urutanmu</div>
+              <button class="btn btn-secondary btn-xs" onclick="clearWS()"><span class="ic-h" data-ic="trash"></span>
+                Hapus Semua</button>
+            </div>
+            <div class="dec-reminder"><span class="ic-h" data-ic="check"></span>
+              <span id="decReminder">Keputusan awalmu: ...</span>
+            </div>
+            <div class="drop-zone" id="dropZone" ondragover="dzOver(event)" ondrop="dzDrop(event)"
+              ondragleave="dzLeave(event)"></div>
+            <div class="run-bar">
+              <div class="run-info"><em id="blkCount">0</em> blok ditambahkan <span class="run-hint"
+                  id="runHint"></span></div>
+              <button class="btn btn-secondary btn-xs" onclick="backToDecision()"><span class="ic-h"
+                  data-ic="arrowLeft"></span> Kembali</button>
+              <button class="btn btn-run" onclick="runSeq()"><span class="ic-h" data-ic="play"></span> JALANKAN</button>
+            </div>
+          </div>
+          <div class="palette">
+            <div class="pal-head"><span class="ic-h" data-ic="puzzle"></span> Blok Tersedia</div>
+            <div class="pal-scroll" id="palScroll"></div>
+          </div>
+        </div>
+        <!-- RUN OVERLAY -->
+        <div class="exec-ov" id="execOv">
+          <div class="run-stage" id="runStage">
+            <div class="scene-layer" id="runScene"></div>
+            <div class="sim-water-overlay" id="runWater"></div>
+            <div class="sim-char" id="runChar"></div>
+            <div class="exec-center">
+              <div class="exec-card" id="execCard">
+                <div class="exec-ico" id="execIco"></div>
+                <div class="exec-name" id="execName">Bersiap...</div>
+                <div class="exec-desc" id="execDesc"></div>
+              </div>
+            </div>
+          </div>
+          <div class="exec-foot">
+            <div class="exec-status" id="execStatus">Langkah 1</div>
+            <div class="exec-dots" id="execDots"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <video class="res-bg-video" muted playsinline autoplay loop aria-hidden="true">
+      <source src="assets/videos/background_menuutama_loop.mp4" type="video/mp4">
+    </video>
+    <div class="res-wrap">
+      <div class="res-card">
+        <button class="res-back" onclick="gotoScreen('select')" aria-label="Kembali ke peta misi">
+          <span class="ic-h" data-ic="arrowLeft"></span><span class="res-back-label">Peta Misi</span>
+        </button>
+        <span class="res-emoji" id="resEmoji"></span>
+        <div class="res-title great" id="resTitle">Luar Biasa!</div>
+        <div class="res-stars" id="resStars"></div>
+        <div class="res-score-wrap"><span class="res-score" id="resScore">95</span><span
+            class="res-score-lbl">Poin</span></div>
+        <div class="res-box">
+          <h3><span class="ic-h" data-ic="book"></span> Pelajaran Hari Ini</h3>
+          <div class="res-exp" id="resExp"></div>
+          <div id="resFeedback"></div>
+        </div>
+        <div class="res-mascot" id="resMascot" style="display:none"></div>
+        <div class="res-btns" id="resActions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 Firebase SDK (opsional saat pratinjau, WAJIB setelah publish agar akun tersambung database) -->
+  <!-- Lihat panduan lengkap di js/firebase-auth.js -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-auth.js"></script>
+
+  <script src="js/graphics.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+
+</html>
