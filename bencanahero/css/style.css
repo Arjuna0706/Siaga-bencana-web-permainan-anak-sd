@@ -272,7 +272,7 @@
   position: relative;
   display: flex;
   gap: 8px;
-  align-items: center; /* Pastikan semua dot sejajar secara vertikal */
+  align-items: center; 
   height: 8px;
 }
 
@@ -303,8 +303,6 @@
     .ds-logo { display: flex; align-items: center; gap: 6px; font-family: var(--disp); font-weight: 800;
       font-size: 21px; color: var(--ink); padding: 0px 8px 22px; position: relative; }
     .ds-logo .ds-shield { width: 100px; height: 100px; object-fit: contain; display: block; position: relative; z-index: 1; transform: translateX(-30px);}
-    /* Teks logo ditumpuk DI ATAS gambar shield (bukan sekadar sebelahan) — margin negatif
-       menariknya menimpa bagian kanan logo, z-index memastikan teks tetap di lapisan atas. */
     .ds-logo > span { position: relative; z-index: 2; margin-left: -60px; }
     .ds-nav { display: flex; flex-direction: column; gap: 4px; }
     .ds-item { display: flex; align-items: center; gap: 13px; padding: 12px 14px; border: none; background: transparent;
@@ -320,17 +318,6 @@
   z-index: 4; flex-shrink: 0;
   position: relative; overflow: visible;
   container-type: inline-size; }
-    /* dh-bg-img & dh-fg-img: top, left, width, DAN height semuanya memakai cqw (container
-       query width) — artinya keempatnya dihitung dari SATU basis yang sama (lebar header),
-       bukan dicampur seperti sebelumnya (top/left/width pakai cqw/%, tapi height pakai
-       calc(260% + 1050px) yang basisnya TINGGI header + angka px tetap). Karena tinggi
-       header nyaris konstan sementara lebarnya berubah mengikuti lebar viewport (termasuk
-       saat di-zoom), campuran basis itulah yang membuat object-fit:contain menghitung ulang
-       skala & posisi tengah gambar secara tidak konsisten, sehingga terlihat "bergerak"/
-       "zoom" dan tidak kembali ke semula. Dengan semua nilai di basis cqw yang sama, ukuran
-       & posisi tetap responsif mengikuti lebar layar/jendela apa pun, tapi berskala
-       proporsional & konsisten sehingga tidak pernah "loncat". Nilai di bawah disesuaikan
-       agar tampilan default (di lebar layar standar) tetap sama seperti sebelumnya. */
     .dh-bg-img { position: absolute; top: -36cqw; left: -3.66cqw; width: 114cqw; height: 60.49cqw;
   object-fit: cover; object-position: center; z-index: 0; pointer-events: none; }
     .dh-fg-img { position: absolute; top: -53.1cqw; left: -0.9cqw; width: 107cqw; height: 123.82cqw;
