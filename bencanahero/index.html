@@ -14,7 +14,6 @@
 </head>
 
 <body>
-  <!-- 🎵 Musik latar (BGM). Taruh file audio.mp3 kamu di folder audio/ dengan nama persis di bawah ini. -->
   <audio id="menuBgmAudio" src="assets/audio/menu-bgm.mp3" loop preload="auto"></audio>
   <audio id="mainBgmAudio" src="assets/audio/main-bgm.mp3" loop preload="auto"></audio>
 
@@ -23,14 +22,6 @@
     <div class="sun"></div>
   </div>
   <div id="confetti"></div>
-
-  <!-- 🎬 Video latar BERSAMA untuk Splash / Menu Utama / Login.
-       HANYA SATU elemen <video> ini yang dipakai oleh ketiga layar tersebut — elemen ini
-       dipindah (prepend) ke layar yang sedang aktif lewat js/game.js, sehingga waktu
-       putarnya TIDAK pernah reset/restart saat berpindah antar Splash/Menu/Login.
-       Alurnya: mula-mula memutar file "intro" (background_menuutama.mp4) SEKALI (tanpa
-       loop). Begitu selesai, otomatis lanjut memutar file "loop" (background_menuutama_loop.mp4)
-       yang diulang terus-menerus. Cukup sediakan kedua file ini di assets/videos/. -->
   <video id="menuUtamaBgVideo" class="menu-bg-video" muted playsinline autoplay aria-hidden="true"></video>
 
   <!-- SPLASH -->
@@ -530,8 +521,6 @@
     </div>
   </div>
 
-  <!-- 🔥 Firebase SDK (opsional saat pratinjau, WAJIB setelah publish agar akun tersambung database) -->
-  <!-- Lihat panduan lengkap di js/firebase-auth.js -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
